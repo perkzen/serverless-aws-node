@@ -1,0 +1,78 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: perkzen
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: faas
+service: car-management-system
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    CARS_TABLE: ${self:service}-events
+
+plugins:
+  - serverless-offline
+  - serverless-localstack
+
+custom:
+  localstack:
+    stages:
+      - local
+
+functions:
+  createCar:
+    handler: handler.createCar
+    events:
+      - http:
+          path: /cars
+          method: post
+          cors: true
+
+  getCars:
+    handler: handler.getCars
+    events:
+      - http:
+          path: /cars
+          method: get
+          cors: true
+
+  getCarById:
+    handler: handler.getCarById
+    events:
+      - http:
+          path: /cars/{id}
+          method: get
+          cors: true
+
+  updateCar:
+    handler: handler.updateCar
+    events:
+      - http:
+          path: /cars/{id}
+          method: put
+          cors: true
+
+  deleteCar:
+    handler: handler.deleteCar
+    events:
+      - http:
+          path: /cars/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    EventsDynanoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.CARS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
