@@ -39,8 +39,6 @@ module.exports.login = async (event) => {
             })
         };
     }
-    // Auto-invoking function
-    await module.exports.handleUserLogin(event);
 
     return {
         statusCode: 401,
@@ -59,6 +57,11 @@ module.exports.createCar = async (event) => {
         TableName: TABLE_NAME,
         Item: newCar
     }).promise();
+
+    // Auto-invoking function
+    await module.exports.sendCarsSummary(event);
+
+
     return {
         statusCode: 201,
         body: JSON.stringify(newCar)
@@ -138,12 +141,14 @@ module.exports.processCarChanges = async (event) => {
     }
 };
 
-module.exports.handleUserLogin = async (event) => {
-    const {username} = JSON.parse(event.body);
-    console.log(`User ${username} logged in at ${new Date().toISOString()}`);
+module.exports.sendCarsSummary = async (event) => {
+    // get all cars
+    const data = await docClient.scan({TableName: TABLE_NAME}).promise();
+    const cars = data.Items;
+
     return {
         statusCode: 200,
-        body: JSON.stringify({message: `User ${username} login processed`})
+        body: JSON.stringify({cars: cars})
     };
 };
 
@@ -155,6 +160,6 @@ module.exports.handleSnsNotification = async (event) => {
     }
     return {
         statusCode: 200,
-        body: JSON.stringify({ message: 'SNS notification processed successfully' })
+        body: JSON.stringify({message: 'SNS notification processed successfully'})
     };
 };

@@ -92,8 +92,10 @@ functions:
     events:
       - sns: carNotification
 
-  handleUserLogin:
-    handler: handler.handleUserLogin
+  sendCarsSummary:
+    handler: handler.sendCarsSummary
+    events:
+      - schedule: rate(1 hours)
 
 resources:
   Resources:
