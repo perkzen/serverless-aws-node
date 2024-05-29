@@ -10,6 +10,7 @@ provider:
   region: us-east-1
   environment:
     CARS_TABLE: ${self:service}-events
+    JWT_SECRET: secret
 
 plugins:
   - serverless-offline
@@ -21,6 +22,14 @@ custom:
       - local
 
 functions:
+  login:
+    handler: handler.login
+    events:
+      - http:
+          path: /login
+          method: post
+          cors: true
+
   createCar:
     handler: handler.createCar
     events:
@@ -61,9 +70,34 @@ functions:
           method: delete
           cors: true
 
+  scheduledTask:
+    handler: handler.scheduledTask
+    events:
+      - schedule:
+          rate: rate(5 minutes)
+
+
+  processCarChanges:
+    handler: handler.processCarChanges
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - CarsTable
+              - StreamArn
+
+  handleSnsNotification:
+    handler: handler.handleSnsNotification
+    events:
+      - sns: carNotification
+
+  handleUserLogin:
+    handler: handler.handleUserLogin
+
 resources:
   Resources:
-    EventsDynanoDBTable:
+    CarsTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:provider.environment.CARS_TABLE}
@@ -76,3 +110,10 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
+
+    EventNotificationTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: carNotification
