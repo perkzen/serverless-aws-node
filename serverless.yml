@@ -95,7 +95,7 @@ functions:
   sendCarsSummary:
     handler: handler.sendCarsSummary
     events:
-      - schedule: rate(1 hours)
+      - schedule: rate(1 day)
 
 resources:
   Resources:
