@@ -9,7 +9,7 @@ provider:
   runtime: nodejs18.x
   region: us-east-1
   environment:
-    CARS_TABLE: ${self:service}-events
+    CARS_TABLE: ${self:service}-cars
     JWT_SECRET: secret
 
 plugins:

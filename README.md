@@ -52,7 +52,7 @@ Start Localstack:
 Create DynamoDB Table and SNS Topic Locally:
 
 ```bash
-    aws --endpoint-url=http://localhost:4566 dynamodb create-table --table-name car-management-system-events --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --region us-east-1
+    aws --endpoint-url=http://localhost:4566 dynamodb create-table --table-name car-management-system-cars --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 --region us-east-1
 
     aws --endpoint-url=http://localhost:4566 sns create-topic --name carNotification --region us-east-1
 ```
